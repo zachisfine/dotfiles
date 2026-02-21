@@ -1,0 +1,89 @@
+# direnvrc — direnv configuration
+# Part of ~/dotfiles — managed via install.sh
+#
+# Custom layout functions for common project types.
+
+# ══════════════════════════════════════════
+# layout_python — Python virtualenv
+# ══════════════════════════════════════════
+# Creates .venv in the project directory.
+# Auto-installs requirements.txt if present.
+#
+# Usage in .envrc:
+#   layout python
+#   layout python python3.11
+layout_python() {
+    local python="${1:-python3}"
+    local venv=".venv"
+
+    if [[ ! -d "$venv" ]]; then
+        log_status "Creating virtualenv: $venv (using $python)"
+        "$python" -m venv "$venv"
+    fi
+
+    source "$venv/bin/activate"
+
+    if [[ -f "requirements.txt" ]]; then
+        log_status "Installing requirements.txt"
+        pip install -q -r requirements.txt
+    fi
+}
+
+# ══════════════════════════════════════════
+# layout_node — Node.js project
+# ══════════════════════════════════════════
+# Reads .nvmrc or .node-version if present.
+# Adds node_modules/.bin to PATH.
+#
+# Usage in .envrc:
+#   layout node
+layout_node() {
+    local node_version_file=""
+
+    if [[ -f ".nvmrc" ]]; then
+        node_version_file=".nvmrc"
+    elif [[ -f ".node-version" ]]; then
+        node_version_file=".node-version"
+    fi
+
+    if [[ -n "$node_version_file" ]]; then
+        local version
+        version=$(<"$node_version_file")
+        log_status "Node version from $node_version_file: $version"
+
+        # Use fnm or nvm if available
+        if has fnm; then
+            eval "$(fnm env --use-on-cd)"
+        elif has nvm; then
+            nvm use "$version" 2>/dev/null || nvm install "$version"
+        fi
+    fi
+
+    PATH_add node_modules/.bin
+}
+
+# ══════════════════════════════════════════
+# layout_poetry — Poetry project
+# ══════════════════════════════════════════
+# Activates the Poetry-managed virtualenv.
+#
+# Usage in .envrc:
+#   layout poetry
+layout_poetry() {
+    if ! has poetry; then
+        log_error "poetry not found"
+        return 1
+    fi
+
+    local venv
+    venv=$(poetry env info --path 2>/dev/null)
+
+    if [[ -z "$venv" || ! -d "$venv" ]]; then
+        log_status "Creating Poetry virtualenv"
+        poetry install
+        venv=$(poetry env info --path)
+    fi
+
+    export VIRTUAL_ENV="$venv"
+    PATH_add "$venv/bin"
+}

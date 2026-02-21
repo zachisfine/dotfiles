@@ -1,0 +1,273 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install fish shell
+        run: sudo apt-get update && sudo apt-get install -y fish
+
+      - name: ShellCheck — scripts with shebangs
+        run: shellcheck -x -e SC1090,SC1091 install.sh
+
+      - name: ShellCheck — bash configs (no shebang)
+        run: |
+          shellcheck --shell=bash -x -e SC1090,SC1091 \
+            bash/.bashrc \
+            shell/aliases.sh \
+            shell/functions.sh \
+            direnv/direnvrc
+
+      - name: Fish syntax check
+        run: |
+          fish --no-execute fish/config.fish
+          fish --no-execute fish/functions/fish_prompt.fish
+
+  validate-configs:
+    name: validate-configs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install taplo
+        run: |
+          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-full-linux-x86_64.gz \
+            | gunzip > /usr/local/bin/taplo
+          chmod +x /usr/local/bin/taplo
+
+      - name: Install yamllint
+        run: pip install --quiet yamllint
+
+      - name: Install editorconfig-checker
+        run: |
+          EC_VERSION="3.0.3"
+          curl -fsSL "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v${EC_VERSION}/ec-linux-amd64.tar.gz" \
+            | tar xz
+          sudo mv bin/ec-linux-amd64 /usr/local/bin/ec
+
+      - name: Validate TOML files
+        run: |
+          taplo check starship/starship.toml
+          taplo check alacritty/alacritty.toml
+
+      - name: Validate YAML files
+        run: yamllint -d relaxed lazygit/config.yml
+
+      - name: EditorConfig check
+        run: ec
+
+  install-test:
+    name: install-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install conditional tools
+        run: sudo apt-get update && sudo apt-get install -y tmux nano wget htop zsh
+
+      - name: Run install.sh
+        run: ./install.sh
+
+      - name: Verify always-linked symlinks
+        run: |
+          set -euo pipefail
+          verify_link() {
+            local link="$1" expected_target="$2"
+            if [ ! -L "$link" ]; then
+              echo "FAIL: $link is not a symlink"
+              return 1
+            fi
+            actual="$(readlink -f "$link")"
+            expected="$(readlink -f "$expected_target")"
+            if [ "$actual" != "$expected" ]; then
+              echo "FAIL: $link -> $actual (expected $expected)"
+              return 1
+            fi
+            echo "OK: $link -> $actual"
+          }
+
+          DOTFILES="$PWD"
+          verify_link "$HOME/.bashrc"                     "$DOTFILES/bash/.bashrc"
+          verify_link "$HOME/.zshrc"                      "$DOTFILES/zsh/.zshrc"
+          verify_link "$HOME/.config/fish/config.fish"    "$DOTFILES/fish/config.fish"
+          verify_link "$HOME/.gitconfig"                  "$DOTFILES/git/.gitconfig"
+          verify_link "$HOME/.vimrc"                      "$DOTFILES/vim/.vimrc"
+          verify_link "$HOME/.inputrc"                    "$DOTFILES/inputrc/.inputrc"
+          verify_link "$HOME/.editorconfig"               "$DOTFILES/editorconfig/.editorconfig"
+          verify_link "$HOME/.ssh/config"                 "$DOTFILES/ssh/config"
+
+      - name: Verify conditional symlinks
+        run: |
+          set -euo pipefail
+          verify_link() {
+            local link="$1" expected_target="$2"
+            if [ ! -L "$link" ]; then
+              echo "FAIL: $link is not a symlink"
+              return 1
+            fi
+            actual="$(readlink -f "$link")"
+            expected="$(readlink -f "$expected_target")"
+            if [ "$actual" != "$expected" ]; then
+              echo "FAIL: $link -> $actual (expected $expected)"
+              return 1
+            fi
+            echo "OK: $link -> $actual"
+          }
+
+          DOTFILES="$PWD"
+          verify_link "$HOME/.tmux.conf"              "$DOTFILES/tmux/.tmux.conf"
+          verify_link "$HOME/.nanorc"                  "$DOTFILES/nano/.nanorc"
+          verify_link "$HOME/.wgetrc"                  "$DOTFILES/wget/.wgetrc"
+          verify_link "$HOME/.config/htop/htoprc"      "$DOTFILES/htop/htoprc"
+
+      - name: Verify SSH permissions
+        run: |
+          set -euo pipefail
+          check_perms() {
+            local path="$1" expected="$2"
+            actual="$(stat -c '%a' "$path")"
+            if [ "$actual" != "$expected" ]; then
+              echo "FAIL: $path has mode $actual (expected $expected)"
+              return 1
+            fi
+            echo "OK: $path mode $actual"
+          }
+
+          check_perms "$HOME/.ssh"         700
+          check_perms "$HOME/.ssh/sockets" 700
+          check_perms "$HOME/.ssh/config"  600
+
+      - name: Verify vim directories exist
+        run: |
+          set -euo pipefail
+          test -d "$HOME/.vim/undodir" && echo "OK: ~/.vim/undodir exists"
+          test -d "$HOME/.vim/swap"    && echo "OK: ~/.vim/swap exists"
+
+      - name: Idempotency — run install.sh again
+        run: |
+          set -euo pipefail
+          output="$(./install.sh)"
+          echo "$output"
+          if ! echo "$output" | grep -q "Already linked"; then
+            echo "FAIL: expected 'Already linked' in output"
+            exit 1
+          fi
+
+      - name: Verify shell configs parse cleanly
+        run: |
+          bash -n "$HOME/.bashrc"
+          zsh -n "$HOME/.zshrc"
+
+  install-test-macos:
+    name: install-test-macos
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: brew install coreutils tmux nano wget htop
+
+      - name: Add GNU coreutils to PATH
+        run: echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
+
+      - name: Run install.sh
+        run: ./install.sh
+
+      - name: Verify always-linked symlinks
+        run: |
+          set -euo pipefail
+          verify_link() {
+            local link="$1" expected_target="$2"
+            if [ ! -L "$link" ]; then
+              echo "FAIL: $link is not a symlink"
+              return 1
+            fi
+            actual="$(readlink -f "$link")"
+            expected="$(readlink -f "$expected_target")"
+            if [ "$actual" != "$expected" ]; then
+              echo "FAIL: $link -> $actual (expected $expected)"
+              return 1
+            fi
+            echo "OK: $link -> $actual"
+          }
+
+          DOTFILES="$PWD"
+          verify_link "$HOME/.bashrc"                     "$DOTFILES/bash/.bashrc"
+          verify_link "$HOME/.zshrc"                      "$DOTFILES/zsh/.zshrc"
+          verify_link "$HOME/.config/fish/config.fish"    "$DOTFILES/fish/config.fish"
+          verify_link "$HOME/.gitconfig"                  "$DOTFILES/git/.gitconfig"
+          verify_link "$HOME/.vimrc"                      "$DOTFILES/vim/.vimrc"
+          verify_link "$HOME/.inputrc"                    "$DOTFILES/inputrc/.inputrc"
+          verify_link "$HOME/.editorconfig"               "$DOTFILES/editorconfig/.editorconfig"
+          verify_link "$HOME/.ssh/config"                 "$DOTFILES/ssh/config"
+
+      - name: Verify conditional symlinks
+        run: |
+          set -euo pipefail
+          verify_link() {
+            local link="$1" expected_target="$2"
+            if [ ! -L "$link" ]; then
+              echo "FAIL: $link is not a symlink"
+              return 1
+            fi
+            actual="$(readlink -f "$link")"
+            expected="$(readlink -f "$expected_target")"
+            if [ "$actual" != "$expected" ]; then
+              echo "FAIL: $link -> $actual (expected $expected)"
+              return 1
+            fi
+            echo "OK: $link -> $actual"
+          }
+
+          DOTFILES="$PWD"
+          verify_link "$HOME/.tmux.conf"              "$DOTFILES/tmux/.tmux.conf"
+          verify_link "$HOME/.nanorc"                  "$DOTFILES/nano/.nanorc"
+          verify_link "$HOME/.wgetrc"                  "$DOTFILES/wget/.wgetrc"
+          verify_link "$HOME/.config/htop/htoprc"      "$DOTFILES/htop/htoprc"
+
+      - name: Verify SSH permissions
+        run: |
+          set -euo pipefail
+          check_perms() {
+            local path="$1" expected="$2"
+            actual="$(stat -f '%Lp' "$path")"
+            if [ "$actual" != "$expected" ]; then
+              echo "FAIL: $path has mode $actual (expected $expected)"
+              return 1
+            fi
+            echo "OK: $path mode $actual"
+          }
+
+          check_perms "$HOME/.ssh"         700
+          check_perms "$HOME/.ssh/sockets" 700
+          check_perms "$HOME/.ssh/config"  600
+
+      - name: Verify vim directories exist
+        run: |
+          set -euo pipefail
+          test -d "$HOME/.vim/undodir" && echo "OK: ~/.vim/undodir exists"
+          test -d "$HOME/.vim/swap"    && echo "OK: ~/.vim/swap exists"
+
+      - name: Idempotency — run install.sh again
+        run: |
+          set -euo pipefail
+          output="$(./install.sh)"
+          echo "$output"
+          if ! echo "$output" | grep -q "Already linked"; then
+            echo "FAIL: expected 'Already linked' in output"
+            exit 1
+          fi
+
+      - name: Verify shell configs parse cleanly
+        run: |
+          bash -n "$HOME/.bashrc"
+          zsh -n "$HOME/.zshrc"

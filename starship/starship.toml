@@ -1,0 +1,196 @@
+# starship.toml — Starship prompt configuration
+# Part of ~/dotfiles — managed via install.sh
+#
+# Replicates the two-line prompt from .bashrc/.zshrc:
+# ┌─[user@host]─[🐍 venv]─[⭐ main *+]─[~/projects/myapp]─[✘ 130]
+# └─❯
+#
+# Uses Catppuccin Mocha palette.
+
+# ══════════════════════════════════════════
+# General
+# ══════════════════════════════════════════
+format = """
+[┌─](dimmed white)\
+[$username[@](reset)$hostname](bold cyan)\
+$python\
+$git_branch\
+$git_status\
+$directory\
+$status\
+$line_break\
+[└─](dimmed white)\
+$character"""
+
+add_newline = false
+
+# ══════════════════════════════════════════
+# Segments
+# ══════════════════════════════════════════
+[username]
+show_always = true
+format = "[\\[](white)[$user](bold cyan)"
+style_user = "bold cyan"
+
+[hostname]
+ssh_only = false
+format = "[$hostname](bold cyan)[\\]](white)[─](dimmed white)"
+
+[directory]
+format = "[\\[](white)[$path](bold blue)[\\]](white)"
+truncation_length = 5
+truncate_to_repo = false
+
+[git_branch]
+format = "[\\[](white)[⭐ $branch](bold yellow)"
+
+[git_status]
+format = "[ $all_status$ahead_behind](bold yellow)[\\]](white)[─](dimmed white)"
+conflicted = "="
+ahead = "⇡"
+behind = "⇣"
+diverged = "⇕"
+untracked = "?"
+stashed = "\\$"
+modified = "*"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+[python]
+format = "[\\[](white)[🐍 $virtualenv](bold green)[\\]](white)[─](dimmed white)"
+detect_versions = false
+detect_files = []
+detect_folders = []
+detect_extensions = []
+
+[status]
+disabled = false
+format = "[─](dimmed white)[\\[](white)[✘ $status](bold red)[\\]](white)"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+# ══════════════════════════════════════════
+# Disabled modules (keep prompt clean)
+# ══════════════════════════════════════════
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+
+[java]
+disabled = true
+
+[ruby]
+disabled = true
+
+[php]
+disabled = true
+
+[dotnet]
+disabled = true
+
+[elixir]
+disabled = true
+
+[elm]
+disabled = true
+
+[erlang]
+disabled = true
+
+[haskell]
+disabled = true
+
+[julia]
+disabled = true
+
+[kotlin]
+disabled = true
+
+[lua]
+disabled = true
+
+[nim]
+disabled = true
+
+[perl]
+disabled = true
+
+[scala]
+disabled = true
+
+[swift]
+disabled = true
+
+[terraform]
+disabled = true
+
+[vagrant]
+disabled = true
+
+[zig]
+disabled = true
+
+[cmake]
+disabled = true
+
+[conda]
+disabled = true
+
+[dart]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[helm]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[package]
+disabled = true
+
+[buf]
+disabled = true
+
+[c]
+disabled = true
+
+[crystal]
+disabled = true
+
+[ocaml]
+disabled = true
+
+[opa]
+disabled = true
+
+[pulumi]
+disabled = true
+
+[purescript]
+disabled = true
+
+[raku]
+disabled = true
+
+[red]
+disabled = true
+
+[vlang]
+disabled = true

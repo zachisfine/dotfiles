@@ -1,0 +1,14 @@
+# bat config — bat/batcat configuration
+# Part of ~/dotfiles — managed via install.sh
+
+# Theme
+--theme="Catppuccin Mocha"
+
+# Show line numbers, git changes, filename header, and grid
+--style="numbers,changes,header,grid"
+
+# Use 4-space tabs
+--tabs=4
+
+# Pager
+--pager="less -FRX"

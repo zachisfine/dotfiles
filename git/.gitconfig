@@ -1,0 +1,138 @@
+[user]
+	# Set your name and email here or in ~/.gitconfig.local
+	# name = Zach
+	# email = zach@example.com
+
+[init]
+	defaultBranch = main
+
+[core]
+	editor = vim
+	autocrlf = input
+	pager = less -FRX
+	whitespace = trailing-space,space-before-tab
+
+[push]
+	autoSetupRemote = true
+	default = current
+
+[pull]
+	rebase = true
+
+[fetch]
+	prune = true
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+
+[merge]
+	conflictstyle = diff3
+	tool = vimdiff
+
+[diff]
+	colorMoved = default
+	algorithm = histogram
+
+[help]
+	autocorrect = prompt
+
+[rerere]
+	enabled = true
+
+# ══════════════════════════════════════════
+# Colors
+# ══════════════════════════════════════════
+[color]
+	ui = auto
+
+[color "branch"]
+	current = yellow bold
+	local = green
+	remote = cyan
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red
+	new = green
+	whitespace = red reverse
+
+[color "status"]
+	added = green
+	changed = yellow
+	untracked = red
+
+# ══════════════════════════════════════════
+# Aliases
+# ══════════════════════════════════════════
+[alias]
+	# Logging
+	lg = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %C(dim)(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
+	ll = log --pretty=format:'%C(yellow)%h %C(blue)%ad%Creset %s %C(cyan)<%an>%C(auto)%d%Creset' --date=short
+	last = log -1 --stat
+
+	# Quick shortcuts
+	s = status -sb
+	co = checkout
+	sw = switch
+	br = branch
+	ci = commit
+	d = diff
+	ds = diff --staged
+	a = add
+	aa = add --all
+	ap = add --patch
+
+	# WIP commit (quick save)
+	wip = !git add -A && git commit -m 'WIP [skip ci]'
+
+	# Undo last commit (keep changes staged)
+	undo = reset --soft HEAD~1
+
+	# Amend without editing message
+	oops = commit --amend --no-edit
+
+	# Show what I've done today
+	today = log --since='6am' --oneline --author='\\(.*\\)'
+
+	# Cleanup merged branches (keeps main, master, develop)
+	cleanup = !git branch --merged | grep -vE '(^\\*|main|master|develop)' | xargs -r git branch -d
+
+	# List aliases
+	aliases = config --get-regexp ^alias\\.
+
+	# Stash shortcuts
+	sl = stash list
+	sp = stash pop
+	ss = stash push -m
+
+	# Find commits by message
+	find = log --all --oneline --grep
+
+	# Show file history
+	filelog = log --follow -p --
+
+	# Short diff stat
+	stat = diff --stat
+
+# ══════════════════════════════════════════
+# URL shortcuts
+# ══════════════════════════════════════════
+[url "git@github.com:"]
+	insteadOf = gh:
+
+[url "git@gitlab.com:"]
+	insteadOf = gl:
+
+# ══════════════════════════════════════════
+# Local overrides
+# ══════════════════════════════════════════
+[include]
+	path = ~/.gitconfig.local
+[credential "https://github.com"]
+	helper = 
+	helper = !/tmp/gh_2.87.2_linux_amd64/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/tmp/gh_2.87.2_linux_amd64/bin/gh auth git-credential

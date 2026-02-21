@@ -1,0 +1,32 @@
+# .ripgreprc — ripgrep configuration
+# Part of ~/dotfiles — managed via install.sh
+#
+# Set RIPGREP_CONFIG_PATH="$HOME/.ripgreprc" in your shell.
+
+# ── Search behavior ──
+--smart-case
+--hidden
+--follow
+--max-columns=200
+--max-columns-preview
+
+# ── Ignore patterns ──
+--glob=!.git/
+--glob=!node_modules/
+--glob=!__pycache__/
+--glob=!.venv/
+--glob=!venv/
+--glob=!vendor/
+--glob=!dist/
+--glob=!build/
+--glob=!.next/
+--glob=!.nuxt/
+--glob=!target/
+--glob=!*.min.js
+--glob=!*.min.css
+--glob=!package-lock.json
+--glob=!yarn.lock
+--glob=!pnpm-lock.yaml
+--glob=!Cargo.lock
+--glob=!go.sum
+--glob=!*.pyc

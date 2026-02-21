@@ -1,0 +1,78 @@
+# .screenrc — GNU Screen configuration
+# Part of ~/dotfiles
+
+# ══════════════════════════════════════════
+# General
+# ══════════════════════════════════════════
+# Skip the startup message
+startup_message off
+
+# Large scrollback buffer
+defscrollback 50000
+
+# 256-color terminal
+term xterm-256color
+
+# UTF-8 support
+defutf8 on
+
+# Visual bell (no audible beep)
+vbell on
+vbell_msg " -- Bell! -- "
+
+# Auto-detach on hangup
+autodetach on
+
+# ══════════════════════════════════════════
+# Display
+# ══════════════════════════════════════════
+# Use login shell
+shell -$SHELL
+
+# Don't block when a program closes the window
+zombie kr
+defnonblock on
+
+# ══════════════════════════════════════════
+# Key bindings
+# ══════════════════════════════════════════
+# Reload config
+bind R source "$HOME/.screenrc"
+
+# Region splits (Ctrl+a | for vertical, Ctrl+a S for horizontal)
+bind | split -v
+bind S split
+
+# Navigate between regions
+bind j focus down
+bind k focus up
+bind h focus left
+bind l focus right
+bind Tab focus next
+
+# Quick window switching
+bind ' ' windowlist -b
+
+# Remove current region
+bind X remove
+
+# ══════════════════════════════════════════
+# Status bar / hardstatus
+# ══════════════════════════════════════════
+# Always show the hardstatus line
+hardstatus alwayslastline
+
+# Format: [host] | window list                          date time
+hardstatus string "%{= .w}%{.g} %H %{.w}|%{-} %-Lw%{.g}%n:%t%{-}%+Lw %=%{.w} %Y-%m-%d %c "
+
+# Caption for split regions — shows the active window info per region
+caption always "%{= .w} %n:%t %{-}"
+
+# ══════════════════════════════════════════
+# Misc
+# ══════════════════════════════════════════
+# Fix for residual text on scroll
+altscreen on
+
+# Log file location
+logfile "$HOME/.screen/screenlog.%n"

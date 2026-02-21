@@ -1,0 +1,34 @@
+# ~/.nanorc — GNU nano config
+# Part of ~/dotfiles — managed via install.sh
+
+# ══════════════════════════════════════════
+# Display
+# ══════════════════════════════════════════
+set linenumbers                     # show line numbers
+set constantshow                    # cursor position in status bar
+set softwrap                        # soft-wrap long lines
+set atblanks                        # wrap at word boundaries (whitespace)
+
+# ══════════════════════════════════════════
+# Indentation
+# ══════════════════════════════════════════
+set autoindent                      # keep indent from previous line
+set tabsize 4                       # tab display width
+set tabstospaces                    # spaces instead of tabs
+
+# ══════════════════════════════════════════
+# Editing
+# ══════════════════════════════════════════
+set trimblanks                      # trim trailing whitespace on save
+set mouse                           # enable mouse support
+
+# ══════════════════════════════════════════
+# Scrolling
+# ══════════════════════════════════════════
+set smooth                          # smooth line-by-line scrolling
+
+# ══════════════════════════════════════════
+# Syntax highlighting
+# ══════════════════════════════════════════
+include "/usr/share/nano/*.nanorc"
+include "/usr/share/nano/extra/*.nanorc"

@@ -1,0 +1,45 @@
+# SSH config — SSH client configuration
+# Part of ~/dotfiles — managed via install.sh
+#
+# Per-host overrides go in ~/.ssh/config.local (not tracked).
+
+# ══════════════════════════════════════════
+# Local overrides (not tracked in dotfiles)
+# ══════════════════════════════════════════
+Include config.local
+
+# ══════════════════════════════════════════
+# Global defaults
+# ══════════════════════════════════════════
+Host *
+    # Keep connections alive (prevent idle timeout)
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+    # Automatically add keys to running ssh-agent
+    AddKeysToAgent yes
+
+    # Only offer the key configured for each host
+    IdentitiesOnly yes
+
+    # Hash hostnames in known_hosts for privacy
+    HashKnownHosts yes
+
+    # Connection multiplexing — reuse existing connections
+    ControlMaster auto
+    ControlPath ~/.ssh/sockets/%r@%h-%p
+    ControlPersist 10m
+
+# ══════════════════════════════════════════
+# Example host blocks (uncomment and customize)
+# ══════════════════════════════════════════
+# Host myserver
+#     HostName example.com
+#     User deploy
+#     Port 22
+#     IdentityFile ~/.ssh/id_ed25519
+
+# Host github.com
+#     HostName github.com
+#     User git
+#     IdentityFile ~/.ssh/id_ed25519_github

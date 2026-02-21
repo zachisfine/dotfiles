@@ -1,0 +1,53 @@
+# config.yml — lazygit configuration
+# Part of ~/dotfiles — managed via install.sh
+#
+# Catppuccin Mocha accent colors.
+
+# ══════════════════════════════════════════
+# General
+# ══════════════════════════════════════════
+gui:
+  mouseEvents: true
+  splitDiff: "auto"
+  border: "rounded"
+  nerdFontsVersion: ""
+  theme:
+    activeBorderColor:
+      - "#a6e3a1"   # Catppuccin green
+      - "bold"
+    inactiveBorderColor:
+      - "#585b70"   # Catppuccin surface2
+    searchingActiveBorderColor:
+      - "#f9e2af"   # Catppuccin yellow
+      - "bold"
+    optionsTextColor:
+      - "#89b4fa"   # Catppuccin blue
+    selectedLineBgColor:
+      - "#313244"   # Catppuccin surface0
+    cherryPickedCommitFgColor:
+      - "#89b4fa"   # Catppuccin blue
+    cherryPickedCommitBgColor:
+      - "#45475a"   # Catppuccin surface1
+    unstagedChangesColor:
+      - "#f38ba8"   # Catppuccin red
+    defaultFgColor:
+      - "#cdd6f4"   # Catppuccin text
+
+# ══════════════════════════════════════════
+# Git
+# ══════════════════════════════════════════
+git:
+  paging:
+    pager: "less -FRX"
+  autoFetch: true
+  autoRefresh: true
+
+# ══════════════════════════════════════════
+# Misc
+# ══════════════════════════════════════════
+refresher:
+  refreshInterval: 10
+  fetchInterval: 60
+
+confirmOnQuit: false
+quitOnTopLevelReturn: true
