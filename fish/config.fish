@@ -12,10 +12,11 @@ set -g fish_greeting ""
 set -gx EDITOR vim
 set -gx VISUAL vim
 set -gx PAGER less
-set -gx LESS "-FRX"
+set -gx LESS "-FRXi"
 set -gx LANG "C.utf8"
 set -gx LC_ALL "C.utf8"
 set -gx RIPGREP_CONFIG_PATH "$HOME/.ripgreprc"
+set -gx PYTHONSTARTUP "$HOME/.pythonrc"
 
 # ══════════════════════════════════════════
 # Path
@@ -200,6 +201,13 @@ end
 
 if command -q direnv
     direnv hook fish | source
+end
+
+if command -q fzf
+    set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --info=inline"
+    if command -q fd
+        set -gx FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude .git"
+    end
 end
 
 # ══════════════════════════════════════════

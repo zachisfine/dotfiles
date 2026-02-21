@@ -1,0 +1,7 @@
+# ~/.config/gh/config.yml — GitHub CLI defaults
+# Part of ~/dotfiles — managed via install.sh
+
+editor: vim
+git_protocol: https
+pager: less -FRX
+prompt: enabled

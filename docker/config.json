@@ -1,0 +1,6 @@
+{
+  "detachKeys": "ctrl-q,ctrl-q",
+  "features": {
+    "buildkit": true
+  }
+}

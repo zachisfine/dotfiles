@@ -37,6 +37,18 @@ Re-running `install.sh` is safe and idempotent. Existing files are backed up to 
 | **Alacritty** | `alacritty/alacritty.toml` | `~/.config/alacritty/alacritty.toml` | `alacritty` installed |
 | **lazygit** | `lazygit/config.yml` | `~/.config/lazygit/config.yml` | `lazygit` installed |
 | **direnv** | `direnv/direnvrc` | `~/.config/direnv/direnvrc` | `direnv` installed |
+| **curl** | `curl/.curlrc` | `~/.curlrc` | `curl` installed |
+| **less** | `less/.lesskey` | `~/.lesskey` | always |
+| **npm** | `npm/.npmrc` | `~/.npmrc` | `npm` installed |
+| **pip** | `pip/pip.conf` | `~/.config/pip/pip.conf` | `pip3` or `pip` installed |
+| **psql** | `psql/.psqlrc` | `~/.psqlrc` | `psql` installed |
+| **Global gitignore** | `git/.gitignore_global` | `~/.gitignore_global` | always |
+| **GnuPG** | `gpg/gpg.conf` | `~/.gnupg/gpg.conf` | `gpg` installed |
+| **GitHub CLI** | `gh/config.yml` | `~/.config/gh/config.yml` | `gh` installed |
+| **Docker** | `docker/config.json` | `~/.docker/config.json` | `docker` installed |
+| **tig** | `tig/.tigrc` | `~/.tigrc` | `tig` installed |
+| **Python REPL** | `python/.pythonrc` | `~/.pythonrc` | `python3` installed |
+| **SQLite** | `sqlite/.sqliterc` | `~/.sqliterc` | `sqlite3` installed |
 
 Shared shell code lives in `shell/aliases.sh` and `shell/functions.sh`, sourced by both bash and zsh.
 
@@ -54,7 +66,9 @@ dotfiles/
 ├── shell/
 │   ├── aliases.sh             # Shared aliases (bash + zsh)
 │   └── functions.sh           # Shared functions (bash + zsh)
-├── git/.gitconfig             # Git config
+├── git/
+│   ├── .gitconfig             # Git config
+│   └── .gitignore_global      # Global gitignore patterns
 ├── vim/.vimrc                 # Vim config
 ├── nvim/init.lua              # Neovim config (Lua)
 ├── nano/.nanorc               # Nano config
@@ -70,7 +84,18 @@ dotfiles/
 ├── htop/htoprc                # htop config
 ├── alacritty/alacritty.toml   # Alacritty terminal config
 ├── lazygit/config.yml         # lazygit config
-└── direnv/direnvrc            # direnv layout functions
+├── direnv/direnvrc            # direnv layout functions
+├── curl/.curlrc               # curl defaults
+├── less/.lesskey              # less key bindings
+├── npm/.npmrc                 # npm defaults
+├── pip/pip.conf               # pip defaults
+├── psql/.psqlrc               # PostgreSQL client config
+├── gpg/gpg.conf               # GnuPG config
+├── gh/config.yml              # GitHub CLI config
+├── docker/config.json         # Docker client config
+├── tig/.tigrc                 # tig config
+├── python/.pythonrc           # Python REPL startup
+└── sqlite/.sqliterc           # SQLite3 defaults
 ```
 
 ## Shell features
@@ -83,6 +108,7 @@ All three shells (bash, zsh, fish) share a consistent experience:
 - **Smart aliases** for `ls` (uses `eza` if available), `cat` (uses `bat` if available), and safety nets (`rm -i`, `mv -i`, `cp -i`)
 - **Git shortcuts** (`gs`, `ga`, `gc`, `gd`, `gl`, `gp`, etc.)
 - **Shared functions**: `extract` (any archive), `mkcd`, `cheat`, `weather`, `sysinfo`, `backup`, `tre`, `up`, `port`, `note`
+- **fzf** integration with `FZF_DEFAULT_OPTS` and `FZF_DEFAULT_COMMAND` (uses `fd` if available)
 - **WSL clipboard** support auto-detected
 
 ## Highlights by config
@@ -127,6 +153,26 @@ Catppuccin Mocha theme, line numbers + git change markers. Aliased as `cat` (no 
 
 Custom layout functions: `layout python` (auto-creates `.venv`), `layout node` (reads `.nvmrc`), `layout poetry` (uses Poetry virtualenv).
 
+### curl
+
+Follow redirects, connection timeouts, retry transient failures, prefer HTTPS.
+
+### GnuPG
+
+Strong digest preferences (SHA-512), long key IDs with fingerprints, `hkps://keys.openpgp.org` keyserver, privacy flags (no version, no comments). The installer sets `~/.gnupg` to mode 700.
+
+### pip
+
+`require-virtualenv = true` prevents accidental global installs — `pip install` only works inside an activated virtualenv.
+
+### Python REPL
+
+Tab completion and persistent history (`~/.python_history`) via the `PYTHONSTARTUP` env var. Loaded automatically in all three shells.
+
+### Global gitignore
+
+OS junk (`.DS_Store`, `Thumbs.db`), editor temps (`.idea/`, `.vscode/`, `*.swp`), `.env` files, `__pycache__/`, and `node_modules/` are excluded from every repo via `core.excludesFile`.
+
 ### EditorConfig
 
 4-space indent / UTF-8 / LF by default. 2-space for web files (`js`, `ts`, `css`, `html`, `json`, `yaml`). Tabs for `Makefile` and Go.
@@ -154,7 +200,7 @@ Every push and pull request runs four parallel checks via GitHub Actions:
 | Job | What it does |
 |---|---|
 | **lint** | ShellCheck on bash scripts, `fish --no-execute` on fish files |
-| **validate-configs** | TOML (`taplo`), YAML (`yamllint`), and EditorConfig (`ec`) validation |
+| **validate-configs** | TOML (`taplo`), YAML (`yamllint`), JSON, and EditorConfig (`ec`) validation |
 | **install-test** | End-to-end `install.sh` on Ubuntu — symlinks, permissions, idempotency, shell parse |
 | **install-test-macos** | Same install verification on macOS (`macos-latest`) |
 

@@ -194,6 +194,87 @@ else
     warn "direnv not found — skipping direnvrc"
 fi
 
+printf "\n${BOLD}── curl ──${RESET}\n"
+if command -v curl &>/dev/null; then
+    link_file "$DOTFILES_DIR/curl/.curlrc" "$HOME/.curlrc"
+else
+    warn "curl not found — skipping .curlrc"
+fi
+
+printf "\n${BOLD}── less ──${RESET}\n"
+link_file "$DOTFILES_DIR/less/.lesskey" "$HOME/.lesskey"
+
+printf "\n${BOLD}── npm ──${RESET}\n"
+if command -v npm &>/dev/null; then
+    link_file "$DOTFILES_DIR/npm/.npmrc" "$HOME/.npmrc"
+else
+    warn "npm not found — skipping .npmrc"
+fi
+
+printf "\n${BOLD}── pip ──${RESET}\n"
+if command -v pip3 &>/dev/null || command -v pip &>/dev/null; then
+    mkdir -p "$HOME/.config/pip"
+    link_file "$DOTFILES_DIR/pip/pip.conf" "$HOME/.config/pip/pip.conf"
+else
+    warn "pip not found — skipping pip.conf"
+fi
+
+printf "\n${BOLD}── psql ──${RESET}\n"
+if command -v psql &>/dev/null; then
+    link_file "$DOTFILES_DIR/psql/.psqlrc" "$HOME/.psqlrc"
+else
+    warn "psql not found — skipping .psqlrc"
+fi
+
+printf "\n${BOLD}── Global gitignore ──${RESET}\n"
+link_file "$DOTFILES_DIR/git/.gitignore_global" "$HOME/.gitignore_global"
+
+printf "\n${BOLD}── GnuPG ──${RESET}\n"
+if command -v gpg &>/dev/null; then
+    mkdir -p "$HOME/.gnupg"
+    chmod 700 "$HOME/.gnupg"
+    link_file "$DOTFILES_DIR/gpg/gpg.conf" "$HOME/.gnupg/gpg.conf"
+else
+    warn "gpg not found — skipping gpg.conf"
+fi
+
+printf "\n${BOLD}── GitHub CLI ──${RESET}\n"
+if command -v gh &>/dev/null; then
+    mkdir -p "$HOME/.config/gh"
+    link_file "$DOTFILES_DIR/gh/config.yml" "$HOME/.config/gh/config.yml"
+else
+    warn "gh not found — skipping gh config"
+fi
+
+printf "\n${BOLD}── Docker ──${RESET}\n"
+if command -v docker &>/dev/null; then
+    mkdir -p "$HOME/.docker"
+    link_file "$DOTFILES_DIR/docker/config.json" "$HOME/.docker/config.json"
+else
+    warn "docker not found — skipping docker config"
+fi
+
+printf "\n${BOLD}── tig ──${RESET}\n"
+if command -v tig &>/dev/null; then
+    link_file "$DOTFILES_DIR/tig/.tigrc" "$HOME/.tigrc"
+else
+    warn "tig not found — skipping .tigrc"
+fi
+
+printf "\n${BOLD}── Python REPL ──${RESET}\n"
+if command -v python3 &>/dev/null; then
+    link_file "$DOTFILES_DIR/python/.pythonrc" "$HOME/.pythonrc"
+else
+    warn "python3 not found — skipping .pythonrc"
+fi
+
+printf "\n${BOLD}── SQLite ──${RESET}\n"
+if command -v sqlite3 &>/dev/null; then
+    link_file "$DOTFILES_DIR/sqlite/.sqliterc" "$HOME/.sqliterc"
+else
+    warn "sqlite3 not found — skipping .sqliterc"
+fi
+
 # ══════════════════════════════════════════
 # Create vim directories
 # ══════════════════════════════════════════

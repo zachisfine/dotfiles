@@ -1,0 +1,16 @@
+# ~/.tigrc — tig defaults
+# Part of ~/dotfiles — managed via install.sh
+
+# Show relative dates (e.g., "2 hours ago")
+set main-view-date = relative
+
+# Short author names
+set main-view-author = abbreviated
+
+# Show line numbers in blame view
+set blame-view-lineno = yes
+
+# Colors
+color cursor white blue bold
+color title-focus white blue bold
+color title-blur white default

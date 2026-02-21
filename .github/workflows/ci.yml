@@ -60,7 +60,10 @@ jobs:
           taplo check alacritty/alacritty.toml
 
       - name: Validate YAML files
-        run: yamllint -d relaxed lazygit/config.yml
+        run: yamllint -d relaxed lazygit/config.yml gh/config.yml
+
+      - name: Validate JSON files
+        run: python3 -c "import json; json.load(open('docker/config.json'))"
 
       - name: EditorConfig check
         run: ec
@@ -72,7 +75,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install conditional tools
-        run: sudo apt-get update && sudo apt-get install -y tmux nano wget htop zsh
+        run: sudo apt-get update && sudo apt-get install -y tmux nano wget htop zsh gnupg sqlite3 tig python3 curl
 
       - name: Run install.sh
         run: ./install.sh
@@ -104,6 +107,8 @@ jobs:
           verify_link "$HOME/.inputrc"                    "$DOTFILES/inputrc/.inputrc"
           verify_link "$HOME/.editorconfig"               "$DOTFILES/editorconfig/.editorconfig"
           verify_link "$HOME/.ssh/config"                 "$DOTFILES/ssh/config"
+          verify_link "$HOME/.lesskey"                    "$DOTFILES/less/.lesskey"
+          verify_link "$HOME/.gitignore_global"           "$DOTFILES/git/.gitignore_global"
 
       - name: Verify conditional symlinks
         run: |
@@ -128,6 +133,21 @@ jobs:
           verify_link "$HOME/.nanorc"                  "$DOTFILES/nano/.nanorc"
           verify_link "$HOME/.wgetrc"                  "$DOTFILES/wget/.wgetrc"
           verify_link "$HOME/.config/htop/htoprc"      "$DOTFILES/htop/htoprc"
+          verify_link "$HOME/.curlrc"                  "$DOTFILES/curl/.curlrc"
+          verify_link "$HOME/.gnupg/gpg.conf"          "$DOTFILES/gpg/gpg.conf"
+          verify_link "$HOME/.tigrc"                   "$DOTFILES/tig/.tigrc"
+          verify_link "$HOME/.pythonrc"                "$DOTFILES/python/.pythonrc"
+          verify_link "$HOME/.sqliterc"                "$DOTFILES/sqlite/.sqliterc"
+
+      - name: Verify GnuPG permissions
+        run: |
+          set -euo pipefail
+          actual="$(stat -L -c '%a' "$HOME/.gnupg")"
+          if [ "$actual" != "700" ]; then
+            echo "FAIL: ~/.gnupg has mode $actual (expected 700)"
+            exit 1
+          fi
+          echo "OK: ~/.gnupg mode $actual"
 
       - name: Verify SSH permissions
         run: |
@@ -174,7 +194,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install tools
-        run: brew install coreutils tmux nano wget htop
+        run: brew install coreutils tmux nano wget htop gnupg sqlite tig python3
 
       - name: Add GNU coreutils to PATH
         run: echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
@@ -209,6 +229,8 @@ jobs:
           verify_link "$HOME/.inputrc"                    "$DOTFILES/inputrc/.inputrc"
           verify_link "$HOME/.editorconfig"               "$DOTFILES/editorconfig/.editorconfig"
           verify_link "$HOME/.ssh/config"                 "$DOTFILES/ssh/config"
+          verify_link "$HOME/.lesskey"                    "$DOTFILES/less/.lesskey"
+          verify_link "$HOME/.gitignore_global"           "$DOTFILES/git/.gitignore_global"
 
       - name: Verify conditional symlinks
         run: |
@@ -233,6 +255,20 @@ jobs:
           verify_link "$HOME/.nanorc"                  "$DOTFILES/nano/.nanorc"
           verify_link "$HOME/.wgetrc"                  "$DOTFILES/wget/.wgetrc"
           verify_link "$HOME/.config/htop/htoprc"      "$DOTFILES/htop/htoprc"
+          verify_link "$HOME/.gnupg/gpg.conf"          "$DOTFILES/gpg/gpg.conf"
+          verify_link "$HOME/.tigrc"                   "$DOTFILES/tig/.tigrc"
+          verify_link "$HOME/.pythonrc"                "$DOTFILES/python/.pythonrc"
+          verify_link "$HOME/.sqliterc"                "$DOTFILES/sqlite/.sqliterc"
+
+      - name: Verify GnuPG permissions
+        run: |
+          set -euo pipefail
+          actual="$(stat -L -c '%a' "$HOME/.gnupg")"
+          if [ "$actual" != "700" ]; then
+            echo "FAIL: ~/.gnupg has mode $actual (expected 700)"
+            exit 1
+          fi
+          echo "OK: ~/.gnupg mode $actual"
 
       - name: Verify SSH permissions
         run: |

@@ -1,0 +1,8 @@
+-- ~/.sqliterc — SQLite3 defaults
+-- Part of ~/dotfiles — managed via install.sh
+
+.mode column
+.headers on
+.timer on
+.prompt "> " ". "
+.nullvalue (null)

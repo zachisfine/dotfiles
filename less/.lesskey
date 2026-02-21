@@ -1,0 +1,7 @@
+# ~/.lesskey — less key bindings
+# Part of ~/dotfiles — managed via install.sh
+# Environment variable LESS is set in shell rc files.
+
+#command
+h left-scroll
+l right-scroll

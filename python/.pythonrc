@@ -1,0 +1,24 @@
+# ~/.pythonrc — Python interactive REPL startup
+# Part of ~/dotfiles — managed via install.sh
+# Activated via PYTHONSTARTUP env var in shell rc files.
+
+import atexit
+import os
+import readline
+import rlcompleter  # noqa: F401 — enables tab completion
+
+# ── Tab completion ──
+readline.parse_and_bind("tab: complete")
+
+# ── Persistent history ──
+_history_file = os.path.expanduser("~/.python_history")
+
+try:
+    readline.read_history_file(_history_file)
+except FileNotFoundError:
+    pass
+
+readline.set_history_length(10000)
+atexit.register(readline.write_history_file, _history_file)
+
+del _history_file, atexit, os, readline, rlcompleter

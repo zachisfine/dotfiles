@@ -31,10 +31,11 @@ shopt -s cmdhist                 # save multi-line commands as one
 export EDITOR="${EDITOR:-vim}"
 export VISUAL="${VISUAL:-vim}"
 export PAGER="less"
-export LESS="-FRX"
+export LESS="-FRXi"
 export LANG="C.utf8"
 export LC_ALL="C.utf8"
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+export PYTHONSTARTUP="$HOME/.pythonrc"
 
 # ══════════════════════════════════════════
 # Path additions
@@ -189,6 +190,13 @@ fi
 
 if command -v direnv &>/dev/null; then
     eval "$(direnv hook bash)"
+fi
+
+if command -v fzf &>/dev/null; then
+    export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --info=inline"
+    if command -v fd &>/dev/null; then
+        export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
+    fi
 fi
 
 # ══════════════════════════════════════════
