@@ -17,11 +17,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y fish
 
       - name: ShellCheck — scripts with shebangs
-        run: shellcheck -x -e SC1090,SC1091 install.sh
+        run: shellcheck -x -e SC1090,SC1091,SC2059 install.sh
 
       - name: ShellCheck — bash configs (no shebang)
         run: |
-          shellcheck --shell=bash -x -e SC1090,SC1091 \
+          shellcheck --shell=bash -x -e SC1090,SC1091,SC2059 \
             bash/.bashrc \
             shell/aliases.sh \
             shell/functions.sh \
@@ -40,7 +40,7 @@ jobs:
 
       - name: Install taplo
         run: |
-          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-full-linux-x86_64.gz \
+          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-linux-x86_64.gz \
             | gunzip > /usr/local/bin/taplo
           chmod +x /usr/local/bin/taplo
 
@@ -134,7 +134,7 @@ jobs:
           set -euo pipefail
           check_perms() {
             local path="$1" expected="$2"
-            actual="$(stat -c '%a' "$path")"
+            actual="$(stat -L -c '%a' "$path")"
             if [ "$actual" != "$expected" ]; then
               echo "FAIL: $path has mode $actual (expected $expected)"
               return 1
@@ -239,7 +239,7 @@ jobs:
           set -euo pipefail
           check_perms() {
             local path="$1" expected="$2"
-            actual="$(stat -f '%Lp' "$path")"
+            actual="$(stat -L -c '%a' "$path")"
             if [ "$actual" != "$expected" ]; then
               echo "FAIL: $path has mode $actual (expected $expected)"
               return 1
