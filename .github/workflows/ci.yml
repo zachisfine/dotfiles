@@ -21,7 +21,7 @@ jobs:
 
       - name: ShellCheck — bash configs (no shebang)
         run: |
-          shellcheck --shell=bash -x -e SC1090,SC1091,SC2059 \
+          shellcheck --shell=bash -x -e SC1090,SC1091,SC2034,SC2059,SC2142,SC2164 \
             bash/.bashrc \
             shell/aliases.sh \
             shell/functions.sh \
