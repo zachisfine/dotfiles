@@ -1,0 +1,53 @@
+name: Workflow Sanity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  no-tabs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail on tabs in workflow files
+        run: |
+          bad=()
+          while IFS= read -r f; do
+            if grep -Pq '\t' "$f"; then
+              bad+=("$f")
+            fi
+          done < <(find .github/workflows -name '*.yml' -o -name '*.yaml' | sort)
+
+          if [ "${#bad[@]}" -gt 0 ]; then
+            echo "Tabs found in workflow file(s):"
+            printf '  - %s\n' "${bad[@]}"
+            exit 1
+          fi
+          echo "No tabs found."
+
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install actionlint
+        run: |
+          set -euo pipefail
+          VERSION="1.7.11"
+          archive="actionlint_${VERSION}_linux_amd64.tar.gz"
+          url="https://github.com/rhysd/actionlint/releases/download/v${VERSION}/${archive}"
+          curl --retry 3 -sSfL -o "${archive}" "${url}"
+          tar -xzf "${archive}" actionlint
+          sudo install -m 0755 actionlint /usr/local/bin/actionlint
+
+      - name: Lint workflows
+        run: actionlint
