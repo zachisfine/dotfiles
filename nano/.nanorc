@@ -23,11 +23,6 @@ set trimblanks                      # trim trailing whitespace on save
 set mouse                           # enable mouse support
 
 # ══════════════════════════════════════════
-# Scrolling
-# ══════════════════════════════════════════
-set smooth                          # smooth line-by-line scrolling
-
-# ══════════════════════════════════════════
 # Syntax highlighting
 # ══════════════════════════════════════════
 include "/usr/share/nano/*.nanorc"
